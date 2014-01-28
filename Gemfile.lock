@@ -5,11 +5,12 @@ GIT
     rmagick (2.13.2)
 
 GEM
-  remote: https://rubygems.org/
+  remote: http://rubygems.org/
   specs:
     addressable (2.3.5)
     atomic (1.1.14)
     buftok (0.2.0)
+    configuration (1.3.2)
     descendants_tracker (0.0.3)
     equalizer (0.0.9)
     faraday (0.9.0)
@@ -24,6 +25,7 @@ GEM
       thread_safe (~> 0.1.3)
     multipart-post (2.0.0)
     naught (1.0.0)
+    rake (10.1.0)
     simple_oauth (0.2.0)
     thread_safe (0.1.3)
       atomic
@@ -44,6 +46,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  configuration
   google-search
+  rake
   rmagick (= 2.13.2)!
   twitter
