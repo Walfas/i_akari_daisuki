@@ -2,7 +2,7 @@ require 'configuration'
 
 Configuration.for 'akari' do
   queue_path 'queue'
-  queue_size 50
+  queue_size 5
   extension 'jpg'
 
   log {

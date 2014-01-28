@@ -34,7 +34,9 @@ module Akari
     end
 
     path = "#{@c.queue_path}/#{Base64.urlsafe_encode64 words}.#{@c.extension}"
-    Akari::Image::akarify(words, url).write path
+    image = Akari::Image::akarify words, url
+    image.write path
+    image.destroy! # Release memory
     path
   end
 
