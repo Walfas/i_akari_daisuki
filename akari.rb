@@ -80,7 +80,7 @@ module Akari
       words = words[rand(words.length), 1 + rand(5)]
       string = words.join(' ')[0,40]
       Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.id})"
-      string
+      CGI.unescapeHTML string
     end
 
     def tweet_image path
