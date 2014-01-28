@@ -60,16 +60,18 @@ module Akari
     require 'twitter'
     @c = Akari::config 'twitter'
 
-    @client = Twitter::REST::Client.new do |config|
-      config.consumer_key        = @c.consumer_key
-      config.consumer_secret     = @c.consumer_secret
-      config.access_token        = @c.access_token
-      config.access_token_secret = @c.access_token_secret
+    module_function
+    def client
+      @client ||= Twitter::REST::Client.new do |config|
+        config.consumer_key        = @c.consumer_key
+        config.consumer_secret     = @c.consumer_secret
+        config.access_token        = @c.access_token
+        config.access_token_secret = @c.access_token_secret
+      end
     end
 
-    module_function
     def get_words
-      @tweets ||= @client
+      @tweets ||= client
         .home_timeline(count: 200)
         .reject { |tweet| tweet.user.id == @c.user_id }
 
@@ -77,7 +79,8 @@ module Akari
       words = tweet.text.split.reject do |word|
         @c.filtered.any? { |filtered_word| word.include? filtered_word }
       end
-      words = words[rand(words.length), 1 + rand(5)]
+      n_words = 1 + rand(5)
+      words = words[rand(words.length - n_words + 1), n_words]
       string = words.join(' ')[0,40]
       Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.id})"
       CGI.unescapeHTML string
@@ -85,15 +88,18 @@ module Akari
 
     def tweet_image path
       basename = File.basename path, '.*'
-      words = Base64.urlsafe_decode64 basename
-      @client.update_with_media words.daisuki, open(path)
+      words = Base64.urlsafe_decode64(basename).force_encoding('UTF-8')
+      client.update_with_media words.daisuki, open(path)
 
       Akari::logger.info "tweeted '#{words}'"
     end
 
     def refollow
-      ids = @client.follower_ids.to_a
-      @client.follow ids
+      followers = client.followers.take 20
+      new_followers = followers.reject { |f| f.following || f.protected }.map(&:screen_name)
+      client.follow new_followers
+
+      Akari::logger.info "followed #{new_followers.join ','}" unless new_followers.empty?
     end
   end
 
