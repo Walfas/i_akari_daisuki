@@ -2,6 +2,7 @@
 
 require_relative 'config'
 require 'base64'
+require 'logger'
 
 class String
   def daisuki separator=' '
@@ -15,6 +16,10 @@ module Akari
   module_function
   def config namespace=''
     namespace.empty? ? @c : @c.send(namespace)
+  end
+
+  def logger
+    @logger ||= Logger.new @c.log.path, @c.log.num_files, @c.log.max_size
   end
 
   def fetch
@@ -63,20 +68,25 @@ module Akari
     module_function
     def get_words
       @tweets ||= @client
-        .home_timeline(count: 200, trim_user: true)
+        .home_timeline(count: 200)
         .reject { |tweet| tweet.user.id == @c.user_id }
 
-      words = @tweets.sample.text.split.reject do |word|
+      tweet = @tweets.sample
+      words = tweet.text.split.reject do |word|
         @c.filtered.any? { |filtered_word| word.include? filtered_word }
       end
       words = words[rand(words.length), 1 + rand(5)]
-      thing = words.join(' ')[0,40]
+      string = words.join(' ')[0,40]
+      Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.id})"
+      string
     end
 
     def tweet_image path
       basename = File.basename path, '.*'
       words = Base64.urlsafe_decode64 basename
       @client.update_with_media words.daisuki, open(path)
+
+      Akari::logger.info "tweeted '#{words}'"
     end
 
     def refollow
@@ -92,7 +102,9 @@ module Akari
     def search query
       search_settings = { query: query, safe: 'active' }
       results = Google::Search::Image.new(search_settings).to_a
-      results.sample.uri unless results.empty?
+      uri = results.sample.uri unless results.empty?
+      Akari::logger.info "searched '#{query}' and got '#{uri}'"
+      uri
     end
   end
 

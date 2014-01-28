@@ -1,11 +1,15 @@
 require 'configuration'
 
 Configuration.for 'akari' do
-  log_path 'log'
-
   queue_path 'queue'
   queue_size 50
   extension 'jpg'
+
+  log {
+    path 'log/activity.log'
+    num_files 10
+    max_size 1024000
+  }
 
   twitter {
     consumer_key        ''
