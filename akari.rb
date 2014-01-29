@@ -104,7 +104,8 @@ module Akari
       end.sample
 
       start_index, end_index = if end_index.nil?
-        [0, @c.max_string_length]
+        half = @c.max_string_length/2
+        [0, rand(half) + half]
       else
         [start_index, end_index].sort
       end
@@ -149,8 +150,8 @@ module Akari
     module_function
     # Returns an ImageList of the final image
     def akarify words, url
-      image_file = open(url).read
-      canvas = Magick::ImageList.new.from_blob(image_file)
+      image_file = open(url)
+      canvas = Magick::ImageList.new.from_blob(image_file.read)
         .resize_to_fill(@c.width, @c.height)
       akari = Magick::ImageList.new(Dir["#{@c.akari_dir}/*.{png,gif}"].sample)
         .resize_to_fit(@c.width, @c.height)
@@ -168,7 +169,11 @@ module Akari
       end.first
 
       canvas.composite! akari, Magick::SouthEastGravity, Magick::SrcOverCompositeOp
+      akari.destroy!
       canvas.composite! caption, Magick::SouthGravity, Magick::SrcOverCompositeOp
+      caption.destroy!
+      image_file.close
+      canvas
     end
 
   end
