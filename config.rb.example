@@ -2,6 +2,7 @@ require 'configuration'
 
 Configuration.for 'akari' do
   queue_path 'queue'
+  queue_add_size 2
   queue_size 5
   extension 'jpg'
   max_string_length 45

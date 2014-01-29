@@ -53,7 +53,8 @@ module Akari
   end
 
   def enqueue
-    fetch until image_paths.length >= @c.queue_size
+    n = [@c.queue_size - image_paths.length, @c.queue_add_size].min
+    n.times { fetch }
   end
 
   def dequeue
