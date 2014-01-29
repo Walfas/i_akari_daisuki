@@ -8,6 +8,14 @@ class String
   def daisuki separator=' '
     "わぁい#{self}#{separator}あかり#{self}大好き"
   end
+
+  def indices c
+    (0 ... self.length).find_all { |i| self[i,1] == c }
+  end
+
+  def cjk?
+    !!(self =~ /\p{Han}|\p{Katakana}|\p{Hiragana}|\p{Hangul}/)
+  end
 end
 
 module Akari
@@ -73,17 +81,34 @@ module Akari
     def get_words
       @tweets ||= client
         .home_timeline(count: 200)
-        .reject { |tweet| tweet.user.id == @c.user_id }
+        .reject { |tweet| tweet.user.screen_name == @c.screen_name }
 
       tweet = @tweets.sample
       words = tweet.text.split.reject do |word|
         @c.filtered.any? { |filtered_word| word.include? filtered_word }
-      end
-      n_words = 1 + rand(5)
-      words = words[rand(words.length - n_words + 1), n_words]
-      string = words.join(' ')[0,40]
+      end.join ' '
+      string = parse_tweet CGI.unescapeHTML(words)
+
       Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.id})"
-      CGI.unescapeHTML string
+      string
+    end
+
+    def parse_tweet text
+      text = CGI.unescapeHTML text
+
+      word_boundaries = text.indices(' ') << 0 << text.length
+      start_index = word_boundaries.sample
+      end_index = word_boundaries.select do |i|
+        distance = (start_index - i).abs
+        distance > 0 && distance < @c.max_string_length
+      end.sample
+
+      start_index, end_index = if end_index.nil?
+        [0, @c.max_string_length]
+      else
+        [start_index, end_index].sort
+      end
+      text[start_index..end_index].strip
     end
 
     def tweet_image path

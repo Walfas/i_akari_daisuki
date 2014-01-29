@@ -4,6 +4,7 @@ Configuration.for 'akari' do
   queue_path 'queue'
   queue_size 5
   extension 'jpg'
+  max_string_length 45
 
   log {
     path 'log/activity.log'
@@ -17,8 +18,8 @@ Configuration.for 'akari' do
     access_token        ''
     access_token_secret ''
 
+    screen_name 'your_name'
     filtered %w{@ http:// https:// RT}
-    user_id 1234
   }
 
   imagemagick {
