@@ -9,7 +9,7 @@ task :enqueue do
 end
 
 task :tweet do
-  Akari::enqueue
   Akari::dequeue
+  Akari::enqueue
 end
 
