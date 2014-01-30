@@ -1,5 +1,7 @@
 *.swp
 *.swo
+*.log
+queue/*.jpg
 .DS_Store
 config.rb
 
