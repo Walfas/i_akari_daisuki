@@ -128,6 +128,22 @@ module Akari
 
       Akari::logger.info "followed #{new_followers.join ','}" unless new_followers.empty?
     end
+
+    def top_tweets day = DateTime.now.to_date, n = 10
+      tweets = client.user_timeline(count: 200).select { |t| t.created_at.to_date == day }
+      top = tweets.sort_by { |t| -t.favorite_count-t.retweet_count  }.take n
+    end
+
+    def tweets_to_html tweets
+      tweets.map do |t|
+        total = t.favorite_count + t.retweet_count
+        count = "#{total} (#{t.retweet_count} RT + #{t.favorite_count} Favorites)"
+        img = t.media.first.media_url.to_s unless t.media.empty?
+        img = "<img src='#{img.to_s}' />"
+        inner = [count, t.text, img].map { |x| "<p>#{x}</p>" }.join
+        "<li>#{inner}</li>"
+      end.join
+    end
   end
 
   module Search
