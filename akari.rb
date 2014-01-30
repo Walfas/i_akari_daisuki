@@ -129,20 +129,30 @@ module Akari
       Akari::logger.info "followed #{new_followers.join ','}" unless new_followers.empty?
     end
 
-    def top_tweets day = DateTime.now.to_date, n = 10
-      tweets = client.user_timeline(count: 200).select { |t| t.created_at.to_date == day }
-      top = tweets.sort_by { |t| -t.favorite_count-t.retweet_count  }.take n
+    def sort_popularity tweets
+      tweets.sort_by { |t| -t.favorite_count-t.retweet_count  }
     end
 
-    def tweets_to_html tweets
-      tweets.map do |t|
+    def filter_by_day tweets, day = DateTime.now.to_date
+      tweets.select { |t| t.created_at.to_date == day }
+    end
+
+    def to_html tweets
+      li = tweets.map do |t|
         total = t.favorite_count + t.retweet_count
         count = "#{total} (#{t.retweet_count} RT + #{t.favorite_count} Favorites)"
         img = t.media.first.media_url.to_s unless t.media.empty?
-        img = "<img src='#{img.to_s}' />"
-        inner = [count, t.text, img].map { |x| "<p>#{x}</p>" }.join
+        img = "<img src='#{img}' />"
+        img = "<a href='#{t.url}'>#{img}</a>"
+        inner = [count, img, t.text].map { |x| "<p>#{x}</p>" }.join
         "<li>#{inner}</li>"
       end.join
+      "<ul>#{li}</ul>"
+    end
+
+    def top_tweets day = DateTime.now.to_date, n = 10
+      @own_tweets ||= client.user_timeline count: 200
+      sort_popularity(filter_by_day @own_tweets, day).take n
     end
   end
 
