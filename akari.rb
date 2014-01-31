@@ -158,7 +158,7 @@ module Akari
       "<ul>#{li}</ul>"
     end
 
-    def top_tweets day = DateTime.now.to_date, n = 10
+    def top_tweets day = DateTime.now.to_date.prev_day, n = 10
       @own_tweets ||= client.user_timeline count: 200
       sort_popularity(filter_by_day @own_tweets, day).take n
     end

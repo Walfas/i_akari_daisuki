@@ -30,5 +30,13 @@ Configuration.for 'akari' do
     font       'fonts/rounded-mplus-1c-bold.ttf'
     akari_dir  'akari'
   }
+
+  tumblr {
+    hostname 'your-name-here.tumblr.com'
+    consumer_key       ''
+    consumer_secret    ''
+    oauth_token        ''
+    oauth_token_secret ''
+  }
 end
 
