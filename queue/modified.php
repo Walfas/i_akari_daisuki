@@ -19,7 +19,7 @@ function f($file) {
 
 $files = glob('./*.jpg');
 $lines = array_map('f', $files);
-sort($lines, SORT_STRING);
+rsort($lines, SORT_STRING);
 
 foreach($lines as $line) { 
     echo $line . '<br/>';

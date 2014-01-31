@@ -90,7 +90,7 @@ module Akari
       end.join ' '
       string = parse_tweet CGI.unescapeHTML(words)
 
-      Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.id})"
+      Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.url})"
       string
     end
 
@@ -116,8 +116,16 @@ module Akari
     def tweet_image path
       basename = File.basename path, '.*'
       words = Base64.urlsafe_decode64(basename).force_encoding('UTF-8')
-      client.update_with_media words.daisuki, open(path)
+      file = open path
+      begin
+        client.update_with_media words.daisuki, file
+      rescue Twitter::Error::RequestTimeout
+        Akari::logger.warn "twitter timed out for '#{words}'"
+        sleep 30
+        retry
+      end
 
+      file.close
       Akari::logger.info "tweeted '#{words}'"
     end
 
@@ -177,7 +185,7 @@ module Akari
     module_function
     # Returns an ImageList of the final image
     def akarify words, url
-      image_file = open(url)
+      image_file = open url
       canvas = Magick::ImageList.new.from_blob(image_file.read)
         .resize_to_fill!(@c.width, @c.height)
       akari = Magick::ImageList.new(Dir["#{@c.akari_dir}/*.{png,gif}"].sample)
