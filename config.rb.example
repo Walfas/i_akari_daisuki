@@ -38,5 +38,9 @@ Configuration.for 'akari' do
     oauth_token        ''
     oauth_token_secret ''
   }
+
+  wordnik {
+    api_key ''
+  }
 end
 

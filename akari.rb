@@ -30,10 +30,14 @@ module Akari
     @logger ||= Logger.new @c.log.path, @c.log.num_files, @c.log.max_size
   end
 
+  def get_words
+    Akari::Tweets.get_words
+  end
+
   def fetch
     words, url = loop do
       words = loop do
-        words = Akari::Tweets.get_words
+        words = get_words
         break words unless words.strip.empty?
       end
 
