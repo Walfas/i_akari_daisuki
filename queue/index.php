@@ -29,6 +29,7 @@ $nextTime = ceil( time()/$secs ) * $secs;
 foreach($files as $file) { 
     $timestamp = date('m/d/Y h:iA', $nextTime);
     $text = getWords($file);
+    echo "<a href='delete.php?file=$file' onclick=\"return confirm('Delete $text?')\">x</a> ";
     echo "$timestamp <a href='$file'>$text</a><br/>";
     $nextTime += $secs;
 } 

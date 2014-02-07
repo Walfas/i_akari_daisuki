@@ -4,6 +4,10 @@ task :refollow do
   Akari::Tweets::refollow
 end
 
+task :unfollow do
+  Akari::Tweets::unfollow
+end
+
 task :enqueue do
   Akari::enqueue
 end

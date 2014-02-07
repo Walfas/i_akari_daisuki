@@ -137,9 +137,21 @@ module Akari
     def refollow
       followers = client.followers.take 20
       new_followers = followers.reject { |f| f.following || f.protected }.map(&:screen_name)
-      client.follow new_followers
+      return if new_followers.empty?
 
-      Akari::logger.info "followed #{new_followers.join ','}" unless new_followers.empty?
+      client.follow new_followers
+      Akari::logger.info "followed #{new_followers.join ', '}"
+    end
+
+    def unfollow
+      followers = client.follower_ids.to_a
+      friends = client.friend_ids.to_a
+      to_unfollow = friends - followers
+
+      return if to_unfollow.empty?
+      client.unfollow to_unfollow
+      names = client.users(to_unfollow).to_a.map(&:screen_name)
+      Akari::logger.info "unfollowed #{names.join ', '}"
     end
 
     def sort_popularity tweets
