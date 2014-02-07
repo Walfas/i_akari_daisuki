@@ -100,17 +100,18 @@ module Akari
 
     def parse_tweet text
       text = CGI.unescapeHTML text
+      max_length = text.cjk? ? (@c.max_string_length/3).floor : @c.max_string_length
 
       word_boundaries = text.indices(' ') << 0 << text.length
       start_index = word_boundaries.sample
       end_index = word_boundaries.select do |i|
         distance = (start_index - i).abs
-        distance > 0 && distance < @c.max_string_length
+        distance > 0 && distance < max_length
       end.sample
 
       start_index, end_index = if end_index.nil?
-        half = @c.max_string_length/2
-        [0, rand(half) + half]
+        half = max_length/2.floor
+        [0, half + rand(half)]
       else
         [start_index, end_index].sort
       end
