@@ -126,8 +126,7 @@ module Akari
     def random_noun text
       return parse_tweet text if text.cjk?
       @tgr ||= EngTagger.new
-      tagged = @tgr.add_tags text
-      phrases = @tgr.get_noun_phrases tagged
+      phrases = @tgr.get_words text
       if phrases.is_a? Hash
         phrases.keys.sample.to_s.strip
       else
