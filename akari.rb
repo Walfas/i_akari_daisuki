@@ -96,7 +96,7 @@ module Akari
       words = tweet.text.split.reject do |word|
         @c.filtered.any? { |filtered_word| word.include? filtered_word }
       end.join ' '
-      string = parse_tweet CGI.unescapeHTML(words)
+      string = random_noun CGI.unescapeHTML(words)
 
       Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.url})"
       string
@@ -120,6 +120,14 @@ module Akari
         [start_index, end_index].sort
       end
       text[start_index..end_index].strip
+    end
+
+    require 'engtagger'
+    def random_noun text
+      return parse_tweet text if text.cjk?
+      @tgr ||= EngTagger.new
+      tagged = @tgr.add_tags text
+      @tgr.get_noun_phrases(tagged).keys.sample.strip.to_s
     end
 
     def tweet_image path

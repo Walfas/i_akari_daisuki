@@ -12,6 +12,7 @@ GEM
     buftok (0.2.0)
     configuration (1.3.2)
     descendants_tracker (0.0.3)
+    engtagger (0.1.2)
     equalizer (0.0.9)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
@@ -71,6 +72,7 @@ PLATFORMS
 
 DEPENDENCIES
   configuration
+  engtagger
   google-search
   rake
   rmagick (= 2.13.2)!
