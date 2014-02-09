@@ -17,6 +17,11 @@ task :tweet do
   Akari::enqueue
 end
 
+task :akarify, :words, :url do |t, args|
+  url = args[:url] || Akari::Search::search(args[:words])
+  Akari::akarify_and_save args[:words], url
+end
+
 task :tumble, :day do |t, args|
   require_relative 'tumblr'
   args.with_defaults day: DateTime.now.to_date.prev_day.to_s

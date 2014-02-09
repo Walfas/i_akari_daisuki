@@ -45,6 +45,10 @@ module Akari
       break words, url unless url.nil?
     end
 
+    akarify_and_save words, url
+  end
+
+  def akarify_and_save words, url
     path = "#{@c.queue_path}/#{Base64.urlsafe_encode64 words}.#{@c.extension}"
     image = Akari::Image::akarify words, url
     image.write path
