@@ -128,7 +128,8 @@ module Akari
       @tgr ||= EngTagger.new
       phrases = @tgr.get_words text
       if phrases.is_a? Hash
-        phrases.keys.sample.to_s.strip
+        phrase = phrases.keys.sample.to_s.strip
+        phrase.length < @c.max_string_length ? phrase : ''
       else
         ''
       end
