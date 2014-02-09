@@ -127,7 +127,12 @@ module Akari
       return parse_tweet text if text.cjk?
       @tgr ||= EngTagger.new
       tagged = @tgr.add_tags text
-      @tgr.get_noun_phrases(tagged).keys.sample.strip.to_s
+      phrases = @tgr.get_noun_phrases tagged
+      if phrases.is_a? Hash
+        phrases.keys.sample.to_s.strip
+      else
+        ''
+      end
     end
 
     def tweet_image path
