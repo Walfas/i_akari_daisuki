@@ -123,12 +123,13 @@ module Akari
     end
 
     require 'engtagger'
+    # not really random noun, just longest noun phrase. oh god this code is such a mess
     def random_noun text
       return parse_tweet text if text.cjk?
       @tgr ||= EngTagger.new
       phrases = @tgr.get_words text
       if phrases.is_a? Hash
-        phrase = phrases.keys.sample.to_s.strip
+        phrase = phrases.keys.max_by(&:length).to_s.strip
         phrase.length < @c.max_string_length ? phrase : ''
       else
         ''
