@@ -9,7 +9,7 @@
 <tt>
 <?php
 
-$secs = 15 * 60;
+$secs = 20 * 60;
 date_default_timezone_set('America/New_York');
 
 function sortFiles($a, $b) {
@@ -29,7 +29,7 @@ $nextTime = ceil( time()/$secs ) * $secs;
 foreach($files as $file) { 
     $timestamp = date('m/d/Y h:iA', $nextTime);
     $text = getWords($file);
-    echo "<a href='delete.php?file=$file' onclick=\"return confirm('Delete $text?')\">x</a> ";
+    echo "[<a href='delete.php?file=$file' onclick=\"return confirm('Delete $text?')\">x</a>] ";
     echo "$timestamp <a href='$file'>$text</a><br/>";
     $nextTime += $secs;
 } 

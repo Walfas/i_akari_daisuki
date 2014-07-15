@@ -96,7 +96,8 @@ module Akari
       words = tweet.text.split.reject do |word|
         @c.filtered.any? { |filtered_word| word.include? filtered_word }
       end.join ' '
-      string = random_noun CGI.unescapeHTML(words)
+      words = CGI.unescapeHTML words
+      string = rand < 0.7 ? random_noun(words) : parse_tweet(words)
 
       Akari::logger.info "fetched '#{string}' from '#{tweet.text}' via @#{tweet.user.screen_name} (#{tweet.url})"
       string
