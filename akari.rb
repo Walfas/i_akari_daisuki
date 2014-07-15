@@ -141,7 +141,7 @@ module Akari
       basename = File.basename path, '.*'
       words = Base64.urlsafe_decode64(basename).force_encoding('UTF-8')
       file = open path
-      begin
+      tweet = begin
         client.update_with_media words.daisuki, file
       rescue Twitter::Error::RequestTimeout
         Akari::logger.warn "twitter timed out for '#{words}'"
@@ -150,7 +150,7 @@ module Akari
       end
 
       file.close
-      Akari::logger.info "tweeted '#{words}'"
+      Akari::logger.info "tweeted '#{words}' #{tweet.url}"
     end
 
     def refollow
