@@ -5,8 +5,14 @@ require 'base64'
 require 'logger'
 
 class String
-  def daisuki separator=' '
-    "わぁい#{self}#{separator}あかり#{self}大好き"
+  def daisuki separator=''
+    #"わぁい#{self}#{separator}あかり#{self}大好き"
+    shortened = if self.cjk?
+      self.chars.take(2).join
+    else
+      self.split(' ').map {|w| w.match(/.+?([aeiou]|\Z)/i)[0] }.take(2).join
+    end
+    "私の熱い#{self}活動、#{separator}#{shortened}カツ！始まります！"
   end
 
   def indices c
@@ -49,7 +55,7 @@ module Akari
   end
 
   def akarify_and_save words, url
-    path = "#{@c.queue_path}/#{Base64.urlsafe_encode64 words}.#{@c.extension}"
+    path = "#{@c.queue_path}/#{Base64.urlsafe_encode64 words}.jpg"
     image = Akari::Image::akarify words, url
     image.write path
     image.destroy! # Release memory
@@ -57,7 +63,7 @@ module Akari
   end
 
   def image_paths
-    Dir["#{@c.queue_path}/*.#{@c.extension}"]
+    Dir["#{@c.queue_path}/*.{#{@c.extension.join ','}}"]
   end
 
   def enqueue
@@ -147,6 +153,8 @@ module Akari
         Akari::logger.warn "twitter timed out for '#{words}'"
         sleep 30
         retry
+      rescue Twitter::Error => e
+        Akari::logger.error "twitter failure #{e.message}"
       end
 
       file.close
